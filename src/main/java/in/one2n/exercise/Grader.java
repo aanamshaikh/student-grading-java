@@ -16,6 +16,7 @@ public class Grader {
         List<Student> students = new ArrayList<>();
         BufferedReader reader ;
         String line = "";
+
         try{
             reader = new BufferedReader(new FileReader(filepath));
             reader.readLine();
@@ -25,6 +26,7 @@ public class Grader {
                         Double.valueOf(values[3]),Double.valueOf(values[4]),
                         Double.valueOf(values[5]),Double.valueOf(values[6])));
             }
+            reader.close();
             return students;
 
         } catch (IOException e) {

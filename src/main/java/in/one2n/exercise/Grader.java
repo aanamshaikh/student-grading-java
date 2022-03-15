@@ -14,7 +14,7 @@ public class Grader {
         // TODO: add your implementation here
 
         List<Student> students = new ArrayList<>();
-        BufferedReader reader ;
+        BufferedReader reader = null ;
         String line = "";
 
         try{
@@ -26,11 +26,17 @@ public class Grader {
                         Double.valueOf(values[3]),Double.valueOf(values[4]),
                         Double.valueOf(values[5]),Double.valueOf(values[6])));
             }
-            reader.close();
+
             return students;
 
         } catch (IOException e) {
             e.printStackTrace();
+        }finally{
+            try {
+                reader.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
         return Collections.emptyList();
@@ -72,16 +78,17 @@ public class Grader {
     }
 
     public Map<String, Student> findTopperPerUniversity(List<Student> gradedStudents) {
-        HashMap<String,Student> map = new HashMap<>();
+
         // TODO: add your implementation her
 
-        Comparator<Student> c = Comparator.comparing(Student::getUniversity).
-                thenComparing(Student::getFinalScore);
-        Collections.sort(gradedStudents,c);
-        for(Student str: gradedStudents) {
-            map.put(str.getUniversity(),str);
-        }
-        if(!map.isEmpty()) {
+        if(!gradedStudents.isEmpty()) {
+            HashMap<String,Student> map = new HashMap<>();
+            Comparator<Student> compareByUniversityAndScore = Comparator.comparing(Student::getUniversity).
+                    thenComparing(Student::getFinalScore);
+            Collections.sort(gradedStudents,compareByUniversityAndScore);
+            for(Student str: gradedStudents) {
+                map.put(str.getUniversity(),str);
+            }
             return map;
         }
 

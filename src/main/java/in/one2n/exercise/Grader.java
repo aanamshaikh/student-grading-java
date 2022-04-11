@@ -1,12 +1,15 @@
 package in.one2n.exercise;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
 
 import static in.one2n.exercise.Grade.F;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.partitioningBy;
 
 public class Grader {
 
@@ -20,6 +23,7 @@ public class Grader {
         try{
             reader = new BufferedReader(new FileReader(filepath));
             reader.readLine();
+
             while((line = reader.readLine()) != null) {
                 String[] values = line.split(",");
                 students.add(new Student(values[0],values[1],values[2],
@@ -66,32 +70,50 @@ public class Grader {
 
     public Student findOverallTopper(List<Student> gradedStudents) {
         // TODO: add your implementation here
+        Optional<Student> max = getMax(gradedStudents);
+        return max.orElse(new Student("","",""));
 
-        Collections.sort(gradedStudents, new Comparator<Student>() {
-            @Override
-            public int compare(Student o1, Student o2) {
-                return o1.getFinalScore().compareTo(o2.getFinalScore());
-            }
-        });
+//        Collections.sort(gradedStudents, new Comparator<Student>() {
+//            @Override
+//            public int compare(Student o1, Student o2) {
+//                return o1.getFinalScore().compareTo(o2.getFinalScore());
+//            }
+//        });
 
-        return gradedStudents.get(gradedStudents.size()-1);
+
+//        return gradedStudents.get(gradedStudents.size()-1);
+    }
+
+    private Optional<Student> getMax(List<Student> gradedStudents) {
+        return gradedStudents.stream().max(Comparator.comparing(Student::getFinalScore));
+    }
+    private Student getStudentHighestScore(Student d1, Student d2) {
+        return d1.getFinalScore() > d2.getFinalScore() ? d1 : d2;
     }
 
     public Map<String, Student> findTopperPerUniversity(List<Student> gradedStudents) {
-
         // TODO: add your implementation her
 
-        if(!gradedStudents.isEmpty()) {
-            HashMap<String,Student> map = new HashMap<>();
-            Comparator<Student> compareByUniversityAndScore = Comparator.comparing(Student::getUniversity).
-                    thenComparing(Student::getFinalScore);
-            Collections.sort(gradedStudents,compareByUniversityAndScore);
-            for(Student str: gradedStudents) {
-                map.put(str.getUniversity(),str);
-            }
-            return map;
-        }
 
-         return new HashMap<>();
+       return  gradedStudents.stream().collect(Collectors.groupingBy(Student::getUniversity,
+                Collectors.collectingAndThen(
+                        Collectors.reducing(this::getStudentHighestScore),
+                        Optional::get)));
+
+//        if(!gradedStudents.isEmpty()) {
+//            HashMap<String,Student> map = new HashMap<>();
+//            Comparator<Student> compareByUniversityAndScore = Comparator.comparing(Student::getUniversity).
+//                    thenComparing(Student::getFinalScore);
+//            Collections.sort(gradedStudents,compareByUniversityAndScore);
+//
+//            for(Student str: gradedStudents) {
+//                map.put(str.getUniversity(),str);
+//            }
+//            return map;
+//        }
+//
+//         return new HashMap<>();
     }
+
+
 }
